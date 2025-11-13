@@ -35,26 +35,55 @@ namespace hackernews_api_test.Clients
             return JsonConvert.DeserializeObject<List<int>>(content);
         }
 
-        // get story 
-        public async Task<Story> GetStoryAsync(int id)
+        // get item based on type
+        public async Task<object> GetItemAsync(int id)
         {
-            string endpoint = string.Format(GET_ITEM, id);
-            var response = await _apiClient.GetAsync(endpoint);
-            response.EnsureSuccessStatusCode();
-
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<Story>(content);
-        }
-
-        // get comment 
-        public async Task<Comment> GetCommentAsync(int id)
-        {
-            string endpoint = string.Format(GET_ITEM, id);
-            var response = await _apiClient.GetAsync(endpoint);
-            response.EnsureSuccessStatusCode();
+            string itemId = id.ToString();
+            var response = await GetItem(itemId);
             
-            var contnet = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<Comment>(contnet);
+            // Check if the response is successful
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+            
+            var content = await response.Content.ReadAsStringAsync();
+            
+            // Check if content is null or empty
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return null;
+            }
+            
+            // Deserialize to dynamic to check the type
+            dynamic dynamicItem = JsonConvert.DeserializeObject<dynamic>(content);
+            
+            // Check if dynamicItem is null
+            if (dynamicItem == null)
+            {
+                return null;
+            }
+            
+            // Determine the type and convert accordingly
+            string type = dynamicItem.type?.ToString().ToLower();
+            
+            try 
+            {
+                switch (type)
+                {
+                    case "story":
+                        return JsonConvert.DeserializeObject<Story>(content);
+                    case "comment":
+                        return JsonConvert.DeserializeObject<Comment>(content);
+                    default:
+                        return null;
+                }
+            }
+            catch (JsonException)
+            {
+                // Handle potential deserialization errors
+                return null;
+            }
         }
 
         // get item
