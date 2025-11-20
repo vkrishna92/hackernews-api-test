@@ -1,27 +1,27 @@
-﻿using hackernews_api_test.Models;
-using hackernews_api_test.Utils;
+﻿using hackernews_api_test.Interfaces;
+using hackernews_api_test.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace hackernews_api_test.Clients
 {
-    public class HackerNewsService
+    public class HackerNewsService : IHackerNewsService
     {
-        private readonly ApiClient _apiClient;
-        private readonly ILogger<ApiClient> _logger;
+        private readonly IApiClient _apiClient;
+        private readonly IItemFactory _itemFactory;
+        private readonly ILogger<HackerNewsService> _logger;
 
+        private const string TOP_STORIES_URL = "/topstories.json";
+        private const string GET_ITEM = "/item/{0}.json";
 
-        private readonly string TOP_STORIES_URL = "/topstories.json";
-        private static readonly string GET_ITEM = "/item/{0}.json";
-        public HackerNewsService() 
+        public HackerNewsService(IApiClient apiClient, IItemFactory itemFactory, ILogger<HackerNewsService> logger)
         {
-            _logger = LoggerFactoryHelper.CreateLogger<ApiClient>();
-            _apiClient = new ApiClient();
+            _apiClient = apiClient;
+            _itemFactory = itemFactory;
+            _logger = logger;
         }
 
         // get top stories
@@ -36,54 +36,21 @@ namespace hackernews_api_test.Clients
         }
 
         // get item based on type
-        public async Task<object> GetItemAsync(int id)
+        public async Task<Item> GetItemAsync(int id)
         {
             string itemId = id.ToString();
             var response = await GetItem(itemId);
-            
+
             // Check if the response is successful
             if (!response.IsSuccessStatusCode)
             {
                 return null;
             }
-            
+
             var content = await response.Content.ReadAsStringAsync();
-            
-            // Check if content is null or empty
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                return null;
-            }
-            
-            // Deserialize to dynamic to check the type
-            dynamic dynamicItem = JsonConvert.DeserializeObject<dynamic>(content);
-            
-            // Check if dynamicItem is null
-            if (dynamicItem == null)
-            {
-                return null;
-            }
-            
-            // Determine the type and convert accordingly
-            string type = dynamicItem.type?.ToString().ToLower();
-            
-            try 
-            {
-                switch (type)
-                {
-                    case "story":
-                        return JsonConvert.DeserializeObject<Story>(content);
-                    case "comment":
-                        return JsonConvert.DeserializeObject<Comment>(content);
-                    default:
-                        return null;
-                }
-            }
-            catch (JsonException)
-            {
-                // Handle potential deserialization errors
-                return null;
-            }
+
+            // Use factory to create the item
+            return _itemFactory.CreateItem(content);
         }
 
         // get item
@@ -91,7 +58,7 @@ namespace hackernews_api_test.Clients
         {
             string endpoint = string.Format(GET_ITEM, id);
             var response = await _apiClient.GetAsync(endpoint);
-            return response;            
+            return response;
         }
     }
 }
