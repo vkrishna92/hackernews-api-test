@@ -21,6 +21,8 @@ namespace hackernews_api_test.Tests
             _logger = ServiceProvider.GetRequiredService<ILogger<TopStoriesTests>>();
         }
 
+        [TestCategory("regression")]
+        [TestCategory("smoke")]
         [TestMethod]
         public async Task verify_top_stories()
         {
@@ -29,6 +31,7 @@ namespace hackernews_api_test.Tests
             StoryAssertions.AssertTopStoriesListIsValid(stories);
         }
 
+        [TestCategory("regression")]
         [TestMethod]
         public async Task verify_top_stories_max_legth()
         {
@@ -38,6 +41,8 @@ namespace hackernews_api_test.Tests
         }
 
         [TestMethod]
+        [TestCategory("regression")]
+        [TestCategory("smoke")]
         public async Task verify_top_storiy_item()
         {
             var stories = await HackerNewsService.GetTopStoriesAsync();
@@ -50,6 +55,8 @@ namespace hackernews_api_test.Tests
         }
 
         [TestMethod]
+        [TestCategory("regression")]
+        [TestCategory("smoke")]
         public async Task verify_top_story_comment()
         {
             var stories = await HackerNewsService.GetTopStoriesAsync();
@@ -75,6 +82,7 @@ namespace hackernews_api_test.Tests
         }
 
         [TestMethod]
+        [TestCategory("regression")]
         public async Task verify_non_existent_item_returns_null()
         {
             var item = await HackerNewsService.GetItemAsync(int.MaxValue);
@@ -82,6 +90,7 @@ namespace hackernews_api_test.Tests
         }
 
         [TestMethod]
+        [TestCategory("regression")]
         public async Task verify_null_item_id_returns_unauthorized()
         {
             var itemResponse = await HackerNewsService.GetItem(null);
@@ -89,6 +98,7 @@ namespace hackernews_api_test.Tests
         }
 
         [TestMethod]
+        [TestCategory("regression")]
         public async Task verify_empty_item_id_returns_unauthorized()
         {
             var response = await HackerNewsService.GetItem(string.Empty);
