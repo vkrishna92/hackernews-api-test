@@ -37,11 +37,41 @@ Execute the tests using the .NET CLI:
 dotnet test
 ```
 
+### Test Reporting
+
+This project uses **ExtentReports** to generate comprehensive HTML test reports after each test execution.
+
+**Report Location:**
+After running tests, the HTML report is automatically generated at:
+
+```
+hackernews-api-test/bin/Debug/net8.0/TestReports/TestReport_[timestamp].html
+```
+
+**Opening the Report:**
+Simply open the HTML file in any web browser to view:
+
+- Test execution summary with pass/fail statistics
+- Detailed test results with logs and timestamps
+- Test categories (regression, smoke)
+- System/environment information
+- Interactive dashboard with charts
+
+**Report Features:**
+
+- ✅ Pass/Fail status for each test
+- 📝 Detailed test steps and logs
+- 🏷️ Test categorization (regression, smoke)
+- ⏱️ Execution time tracking
+- 💻 System information (OS, .NET version, etc.)
+- 📊 Visual dashboard with test statistics
+
 ## Key Dependencies
 
 - Microsoft.NET.Test.Sdk
 - Newtonsoft.Json
 - MSTest
+- ExtentReports (for HTML test reporting)
 
 ## Contributing
 
