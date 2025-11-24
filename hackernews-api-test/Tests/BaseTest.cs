@@ -110,7 +110,7 @@ namespace hackernews_api_test.Tests
                 IAmazonS3 s3Client = new AmazonS3Client();
 
                 // Configure S3 bucket and report file details
-                string bucketName = Environment.GetEnvironmentVariable("RESULT_BUCKET_NAME") ?? "hacker-news-api-test-results-bucket-140023384358";
+                string bucketName = Environment.GetEnvironmentVariable("RESULT_BUCKET_NAME") ?? "test-reports";
                 string reportFileName = ExtentReportManager.getFileName();
                 string reportFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestReports", reportFileName);
 
